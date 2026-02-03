@@ -1,5 +1,5 @@
 import React from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, Link } from "react-router-dom"
 import { loginUser } from "../api"
 
 export default function Login() {
@@ -15,10 +15,9 @@ export default function Login() {
     function handleSubmit(e) {
         e.preventDefault()
         setStatus("submitting")
+        setError(null)
         loginUser(loginFormData)
-            .then(data => {
-                setError(null)
-                localStorage.setItem("loggedin", true)
+            .then(() => {
                 navigate(from, { replace: true })
             })
             .catch(err => {
@@ -73,6 +72,10 @@ export default function Login() {
                     }
                 </button>
             </form>
+
+            <p>
+                Don't have an account? <Link to="/signup">Sign up</Link>
+            </p>
         </div>
     )
 }

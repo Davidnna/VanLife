@@ -1,11 +1,11 @@
-import React from "react"
 import { Outlet, Navigate, useLocation } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 
 export default function AuthRequired() {
-    const isLoggedIn = localStorage.getItem("loggedin")
+    const { currentUser } = useAuth()
     const location = useLocation()
     
-    if (!isLoggedIn) {
+    if (!currentUser) {
         return (
             <Navigate 
                 to="/login" 

@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore, collection, doc, getDocs, getDoc, query, where, documentId } from "firebase/firestore/lite"
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
 
 const firebaseConfig = {
     apiKey: "AIzaSyC_cEplLBMhYRt8iBACkJ1JTErKXKpy_us",
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
+export const auth = getAuth(app)
 
 // Refactoring the fetching functions below
 const vansCollectionRef = collection(db, "vans")
@@ -76,18 +78,36 @@ export async function getHostVan(id) {
 }
 
 export async function loginUser(creds) {
-    const res = await fetch("/api/login",
-        { method: "post", body: JSON.stringify(creds) }
-    )
-    const data = await res.json()
-
-    if (!res.ok) {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, creds.email, creds.password)
+        return userCredential.user
+    } catch (error) {
         throw {
-            message: data.message,
-            statusText: res.statusText,
-            status: res.status
+            message: error.message,
+            code: error.code
         }
     }
+}
 
-    return data
+export async function registerUser(creds) {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, creds.email, creds.password)
+        return userCredential.user
+    } catch (error) {
+        throw {
+            message: error.message,
+            code: error.code
+        }
+    }
+}
+
+export async function logoutUser() {
+    try {
+        await signOut(auth)
+    } catch (error) {
+        throw {
+            message: error.message,
+            code: error.code
+        }
+    }
 }
