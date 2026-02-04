@@ -53,7 +53,7 @@ export default function Header() {
                                 title={currentUser.email}
                             />
                         </Link>
-                        <button onClick={handleLogout}>Logout</button>
+                        <button onClick={handleLogout} className="logout-button">Logout</button>
                     </>
                 ) : (
                     <Link to="login">Login</Link>

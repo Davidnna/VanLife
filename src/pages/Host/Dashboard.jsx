@@ -71,10 +71,16 @@ export default function Dashboard() {
                 {
                     loading && !vans
                     ? <h1>Loading...</h1>
-                    : (
+                    : vans.length > 0 ? (
                         <>
                             {renderVanElements(vans)}
                         </>
+                    ) : (
+                        <div className="no-vans-container">
+                            <h2>No vans listed</h2>
+                            <p>You haven't listed any vans yet.</p>
+                            <Link to="vans/new" className="primary-button">List a van</Link>
+                        </div>
                     )
                 }
                 {/*<React.Suspense fallback={<h3>Loading...</h3>}>

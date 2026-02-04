@@ -103,7 +103,17 @@ export default function Vans() {
 
             </div>
             <div className="van-list">
-                {vanElements}
+                {vanElements.length > 0 ? (
+                    vanElements
+                ) : (
+                    <div className="no-vans-container">
+                        <h2>No vans available</h2>
+                        {typeFilter ? 
+                            <p>There are currently no vans matching your filters. Please try a different filter or check back later.</p>
+                            : <p>There are currently no vans available at the time. Please check back later.</p>
+                    }
+                    </div>
+                )}
             </div>
         </div>
     )

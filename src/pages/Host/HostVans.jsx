@@ -49,16 +49,20 @@ export default function HostVans() {
     return (
         <section>
             <h1 className="host-vans-title">Your listed vans</h1>
+            <Link to="new" className="link-button">+ Add a new van</Link>
             <div className="host-vans-list">
                 {
                     vans.length > 0 ? (
                         <section>
                             {hostVansEls}
                         </section>
-                        
                     ) : (
-                            <h2>Loading...</h2>
-                        )
+                        <div className="no-vans-container">
+                            <h2>You haven't listed any vans yet</h2>
+                            <p>Start by adding your first van to begin earning!</p>
+                            <Link to="new" className="primary-button">Add Your First Van</Link>
+                        </div>
+                    )
                 }
             </div>
         </section>

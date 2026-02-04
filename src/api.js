@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore, collection, doc, getDocs, getDoc, query, where, documentId } from "firebase/firestore/lite"
+import { getFirestore, collection, addDoc, doc, getDocs, getDoc, query, where, documentId } from "firebase/firestore/lite"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
 
 const firebaseConfig = {
@@ -21,60 +21,40 @@ const vansCollectionRef = collection(db, "vans")
 
 export async function getVans() {
     const snapshot = await getDocs(vansCollectionRef)
-    const vans = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-    }))
+    const vans = snapshot.docs.map(doc => doc.data())
     return vans
 }
 
 export async function getVan(id) {
-    const docRef = doc(db, "vans", id)
-    const snapshot = await getDoc(docRef)
-    return {
-        ...snapshot.data(),
-        id: snapshot.id
-    }
+    const snapshot = await getDocs(vansCollectionRef)
+    const vans = snapshot.docs.map(doc => doc.data())
+    const van = vans.find(van => van.id === id)
+    return van
 }
 
 export async function getHostVans() {
-    const q = query(vansCollectionRef, where("hostId", "==", "123"))
+    const user = auth.currentUser
+    if (!user) {
+        throw { message: "User not authenticated" }
+    }
+    const q = query(vansCollectionRef, where("hostId", "==", user.uid))
     const snapshot = await getDocs(q)
-    const vans = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-    }))
+    const vans = snapshot.docs.map(doc => doc.data())
     return vans
 }
 
-/* 
-This 👇 isn't normally something you'd need to do. Instead, you'd 
-set up Firebase security rules so only the currently logged-in user 
-could edit their vans.
-
-https://firebase.google.com/docs/rules
-
-I'm just leaving this here for educational purposes, as it took
-me a while to find the `documentId()` function that allows you
-to use a where() filter on a document's ID property. (Since normally
-it only looks at the data() properties of the document, meaning you
-can't do `where("id", "==", id))`
-
-It also shows how you can chain together multiple `where` filter calls
-*/
-
 export async function getHostVan(id) {
+    const user = auth.currentUser
+    if (!user) {
+        throw { message: "User not authenticated" }
+    }
     const q = query(
         vansCollectionRef,
-        // where(documentId(), "==", id),
-        where("hostId", "==", "123")
+        where("hostId", "==", user.uid)
     )
     const snapshot = await getDocs(q)
-    const vans = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-    }))
-    return vans[0]
+    const vans = snapshot.docs.map(doc => doc.data())
+    return vans.find(van => van.id === id)
 }
 
 export async function loginUser(creds) {
@@ -109,5 +89,34 @@ export async function logoutUser() {
             message: error.message,
             code: error.code
         }
+    }
+}
+
+export async function addVan(vanData) {
+    const user = auth.currentUser
+    if (!user) {
+        throw { message: "User not authenticated" }
+    }
+
+    try {
+        const snapshot = await getDocs(vansCollectionRef)
+        let maxId = 0
+        snapshot.docs.forEach(doc => {
+            const docId = parseInt(doc.data().id)
+            if (!isNaN(docId) && docId > maxId) {
+                maxId = docId
+            }
+        })
+
+        const newId = (maxId + 1).toString()
+
+        const docRef = await addDoc(vansCollectionRef, {
+            id: newId,
+            ...vanData,
+            hostId: user.uid
+        })
+        return { id: newId, ...vanData, hostId: user.uid }
+    } catch (error) {
+        throw { message: error.message, code: error.code }
     }
 }
