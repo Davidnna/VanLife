@@ -1,19 +1,25 @@
 import React from "react"
-import { useParams, Link, NavLink, Outlet } from "react-router-dom"
-import { getVan } from "../../api"
+import { useParams, Link, NavLink, Outlet, Navigate } from "react-router-dom"
+import { getHostVan } from "../../api"
+import LoadingSpinner from "../../components/LoadingSpinner"
 
 export default function HostVanDetail() {
     const [currentVan, setCurrentVan] = React.useState(null)
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(null)
+    const [vanNotFound, setVanNotFound] = React.useState(false)
     const { id } = useParams()
 
     React.useEffect(() => {
-        async function loadVans() {
+        async function loadVan() {
             setLoading(true)
             try {
-                const data = await getVan(id)
-                setCurrentVan(data)
+                const data = await getHostVan(id)
+                if (!data) {
+                    setVanNotFound(true)
+                } else {
+                    setCurrentVan(data)
+                }
             } catch (err) {
                 setError(err)
             } finally {
@@ -21,11 +27,15 @@ export default function HostVanDetail() {
             }
         }
 
-        loadVans()
+        loadVan()
     }, [id])
 
+    if (vanNotFound) {
+        return <Navigate to="/not-found" />
+    }
+
     if (loading) {
-        return <h1 aria-live="polite">Loading...</h1>
+        return <LoadingSpinner />
     }
     
     if (error) {
@@ -48,7 +58,7 @@ export default function HostVanDetail() {
             {currentVan &&
                 <div className="host-van-detail-layout-container">
                     <div className="host-van-detail">
-                        <img src={currentVan.imageUrl} />
+                        <img src={currentVan.imageUrl} alt={currentVan.name} />
                         <div className="host-van-detail-info-text">
                             <i
                                 className={`van-type van-type-${currentVan.type}`}

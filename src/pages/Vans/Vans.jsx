@@ -1,6 +1,7 @@
 import React from "react"
 import { Link, useSearchParams } from "react-router-dom"
 import { getVans } from "../../api"
+import LoadingSpinner from "../../components/LoadingSpinner"
 
 export default function Vans() {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -15,6 +16,7 @@ export default function Vans() {
             setLoading(true)
             try {
                 const data = await getVans()
+                data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 setVans(data)
             } catch (err) {
                 setError(err)
@@ -61,7 +63,7 @@ export default function Vans() {
     }
 
     if (loading) {
-        return <h1 aria-live="polite">Loading...</h1>
+        return <LoadingSpinner />
     }
     
     if (error) {
