@@ -1,0 +1,70 @@
+import React from "react"
+import { useAuth } from "../../context/AuthContext"
+import { getHostMessages } from "../../api"
+import LoadingSpinner from "../../components/LoadingSpinner"
+
+export default function Messages() {
+    const { currentUser, userProfile } = useAuth()
+    const [messages, setMessages] = React.useState([])
+    const [loading, setLoading] = React.useState(false)
+    const [error, setError] = React.useState(null)
+
+    React.useEffect(() => {
+        if (!currentUser || userProfile?.userType !== "host") {
+            return
+        }
+
+        async function loadMessages() {
+            setLoading(true)
+            try {
+                const data = await getHostMessages(currentUser.uid)
+                data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                setMessages(data)
+            } catch (err) {
+                setError(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadMessages()
+    }, [currentUser, userProfile])
+
+    if (loading) {
+        return <LoadingSpinner />
+    }
+
+    if (error) {
+        return <h1 aria-live="assertive">There was an error: {error.message}</h1>
+    }
+
+    return (
+        <section className="messages-container">
+            <h1>Messages from Customers</h1>
+            <p className="messages-subtitle">Total messages: {messages.length}</p>
+
+            <div className="messages-list">
+                {messages.length > 0 ? (
+                    messages.map((msg) => (
+                        <div key={msg.id} className={`message-item ${msg.read ? "read" : "unread"}`}>
+                            <div className="message-header">
+                                <h3>{msg.fromEmail}</h3>
+                                <p className="message-date">
+                                    {new Date(msg.createdAt).toLocaleDateString()} {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                </p>
+                            </div>
+                            <div className="message-body">
+                                <p>{msg.message}</p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="no-messages">
+                        <h2>No messages yet</h2>
+                        <p>When customers contact you about your vans, their messages will appear here.</p>
+                    </div>
+                )}
+            </div>
+        </section>
+    )
+}

@@ -2,19 +2,26 @@ import { Outlet, Navigate, useLocation } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 
 export default function AuthRequired() {
-    const { currentUser } = useAuth()
+    const { currentUser, userProfile  } = useAuth()
     const location = useLocation()
+
+    const isHost = userProfile?.userType === "host"
+
+    if (currentUser && location.pathname === "/profile") {
+        return <Outlet />
+    }
     
-    if (!currentUser) {
+    if (!currentUser || !isHost) {
         return (
             <Navigate 
                 to="/login" 
                 state={{
-                    message: "You must log in first",
+                    message: currentUser ? "You must be a host to access this page" : "You must log in first",
                     from: location.pathname
                 }} 
                 replace
-            />)
+            />
+        )
     }
     return <Outlet />
 }

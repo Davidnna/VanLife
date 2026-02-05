@@ -1,11 +1,12 @@
-import { Link, NavLink, useNavigate } from "react-router-dom"
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom"
 import { logoutUser } from "../api"
 import { useAuth } from "../context/AuthContext"
 import imageUrl from "../assets/images/avatar-icon.png"
 
 export default function Header() {
     const navigate = useNavigate()
-    const { currentUser } = useAuth()
+    const location = useLocation()
+    const { currentUser, userProfile } = useAuth()
 
     const activeStyles = {
         fontWeight: "bold",
@@ -13,8 +14,13 @@ export default function Header() {
         color: "#161616"
     }
 
+    const isHost = userProfile?.userType === "host"
+
     async function handleLogout() {
         try {
+            if (location.pathname === "/profile" || isHost) {
+                navigate("/")
+            }
             await logoutUser()
             navigate("/")
         } catch (error) {
@@ -26,12 +32,14 @@ export default function Header() {
         <header>
             <Link className="site-logo" to="/">#VanLife</Link>
             <nav>
-                <NavLink 
-                    to="/host"
-                    style={({ isActive }) => isActive ? activeStyles : null}
-                >
-                    Host
-                </NavLink>
+                {isHost && (
+                    <NavLink 
+                        to="/host"
+                        style={({ isActive }) => isActive ? activeStyles : null}
+                    >
+                        Host
+                    </NavLink>
+                )}
                 <NavLink 
                     to="/about"
                     style={({ isActive }) => isActive ? activeStyles : null}
@@ -46,7 +54,7 @@ export default function Header() {
                 </NavLink>
                 {currentUser ? (
                     <>
-                        <Link to="login" className="login-link">
+                        <Link to="/profile" className="profile-link">
                             <img
                                 src={imageUrl}
                                 className="login-icon"
@@ -56,7 +64,14 @@ export default function Header() {
                         <button onClick={handleLogout} className="logout-button">Logout</button>
                     </>
                 ) : (
-                    <Link to="login">Login</Link>
+                    <NavLink to="/login" 
+                        className="login-button" 
+                        state={{
+                            from: location.pathname
+                        }} 
+                    >
+                        Login
+                    </NavLink>
                 )}
             </nav>
         </header>

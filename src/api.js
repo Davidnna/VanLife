@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore, collection, addDoc, doc, getDocs, getDoc, query, where, documentId } from "firebase/firestore/lite"
+import { getFirestore, collection, addDoc, doc, getDocs, getDoc, query, where, updateDoc, setDoc } from "firebase/firestore/lite"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
 
 const firebaseConfig = {
@@ -20,6 +20,8 @@ export const auth = getAuth(app)
 const vansCollectionRef = collection(db, "vans")
 const reviewsCollectionRef = collection(db, "reviews")
 const contactsCollectionRef = collection(db, "contacts")
+const userProfilesCollectionRef = collection(db, "userProfiles")
+const messagesCollectionRef = collection(db, "messages")
 
 export async function getVans() {
     const snapshot = await getDocs(vansCollectionRef)
@@ -164,18 +166,64 @@ export async function sendContactMessage(hostId, message) {
     }
 
     try {
-        await addDoc(contactsCollectionRef, {
+        await addDoc(messagesCollectionRef, {
             hostId,
             fromUserId: user.uid,
             fromEmail: user.email,
             message,
+            read: false,
             createdAt: new Date().toISOString()
         })
     } catch (error) {
-        // If permission denied, suggest enabling contacts collection
         if (error.code === "permission-denied") {
-            throw { message: "Contacts collection needs to be set up in Firebase. Ask your admin." }
+            throw { message: "Messages collection needs to be set up in Firebase. Ask your admin." }
         }
         throw { message: error.message, code: error.code }
+    }
+}
+
+export async function getUserProfile(userId) {
+    try {
+        const docRef = doc(db, "userProfiles", userId)
+        const snapshot = await getDoc(docRef)
+        if (snapshot.exists()) {
+            return { id: snapshot.id, ...snapshot.data() }
+        }
+        return null
+    } catch (error) {
+        console.log("Could not fetch user profile:", error.message)
+        return null
+    }
+}
+
+export async function createUserProfile(userId, profileData) {
+    try {
+        const docRef = doc(db, "userProfiles", userId)
+        await setDoc(docRef, { ...profileData, userId })
+    } catch (error) {
+        console.log("Could not create user profile:", error.message)
+    }
+}
+
+export async function updateUserProfile(userId, updates) {
+    try {
+        const docRef = doc(db, "userProfiles", userId)
+        await updateDoc(docRef, updates)
+    } catch (error) {
+        throw { message: error.message, code: error.code }
+    }
+}
+
+export async function getHostMessages(hostId) {
+    try {
+        const q = query(messagesCollectionRef, where("hostId", "==", hostId))
+        const snapshot = await getDocs(q)
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    } catch (error) {
+        console.log("Could not fetch messages:", error.message)
+        if (error.code === "permission-denied") {
+            console.warn("Messages collection needs read permission in Firestore rules")
+        }
+        return []
     }
 }

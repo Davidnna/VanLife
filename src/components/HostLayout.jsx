@@ -39,6 +39,13 @@ export default function HostLayout() {
                     Reviews
                 </NavLink>
 
+                <NavLink
+                    to="messages"
+                    style={({ isActive }) => isActive ? activeStyles : null}
+                >
+                    Messages
+                </NavLink>
+
             </nav>
             <Outlet />
         </>

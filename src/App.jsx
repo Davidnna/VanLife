@@ -16,6 +16,8 @@ import HostVanDetail from "./pages/Host/HostVanDetail"
 import HostVanInfo from "./pages/Host/HostVanInfo"
 import HostVanPricing from "./pages/Host/HostVanPricing"
 import HostVanPhotos from "./pages/Host/HostVanPhotos"
+import Messages from "./pages/Host/Messages"
+import Profile from "./pages/Profile"
 import NotFound from "./pages/NotFound"
 import Layout from "./components/Layout"
 import HostLayout from "./components/HostLayout"
@@ -37,10 +39,12 @@ function App() {
 						<Route path="signup" element={<SignUp />} />
 						
 						<Route element={<AuthRequired />}>
+							<Route path="profile" element={<Profile />} />
 							<Route path="host" element={<HostLayout />}>
 								<Route index element={<Dashboard />} />
 								<Route path="income" element={<Income />} />
 								<Route path="reviews" element={<Reviews />} />
+								<Route path="messages" element={<Messages />} />
 								<Route path="vans" element={<HostVans />} />
 								<Route path="vans/new" element={<AddVan />} />
 								<Route path="vans/:id" element={<HostVanDetail />}>
