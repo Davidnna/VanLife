@@ -12,6 +12,7 @@ export default function HostVans() {
             setLoading(true)
             try {
                 const data = await getHostVans()
+                data.sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate())
                 setVans(data)
             } catch (err) {
                 setError(err)

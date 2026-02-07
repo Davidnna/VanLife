@@ -18,6 +18,7 @@ import HostVanPricing from "./pages/Host/HostVanPricing"
 import HostVanPhotos from "./pages/Host/HostVanPhotos"
 import Messages from "./pages/Host/Messages"
 import Profile from "./pages/Profile"
+import PublicProfile from "./pages/PublicProfile"
 import NotFound from "./pages/NotFound"
 import Layout from "./components/Layout"
 import HostLayout from "./components/HostLayout"
@@ -35,6 +36,7 @@ function App() {
 						<Route path="about" element={<About />} />
 						<Route path="vans" element={<Vans />} />
 						<Route path="vans/:id" element={<VanDetail />} />
+						<Route path="user/:username" element={<PublicProfile />} />
 						<Route path="login" element={<Login />} />
 						<Route path="signup" element={<SignUp />} />
 						

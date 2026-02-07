@@ -11,7 +11,10 @@ export default function Dashboard() {
     React.useEffect(() => {
         setLoading(true)
         getHostVans()
-            .then(data => setVans(data))
+            .then(data => {
+                data.sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate())
+                setVans(data)
+            })
             .catch(err => setError(err))
             .finally(() => setLoading(false))
     }, [])

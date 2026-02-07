@@ -1,12 +1,13 @@
 import React from "react"
 import { Link, useParams, useLocation, Navigate } from "react-router-dom"
-import { getVan, addReview, getReviewsForVan, sendContactMessage } from "../../api"
+import { getVan, addReview, getReviewsForVan, sendContactMessage, getUserProfile } from "../../api"
 import { useAuth } from "../../context/AuthContext"
 import LoadingSpinner from "../../components/LoadingSpinner"
 import { BsStarFill } from "react-icons/bs"
 
 export default function VanDetail() {
     const [van, setVan] = React.useState(null)
+    const [hostProfile, setHostProfile] = React.useState(null)
     const [reviews, setReviews] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(null)
@@ -33,7 +34,12 @@ export default function VanDetail() {
                 } else {
                     setVan(data)
                     const reviewsData = await getReviewsForVan(data.vanId)
+                    reviewsData.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
                     setReviews(reviewsData)
+                    
+                    // Fetch host profile
+                    const hostData = await getUserProfile(data.hostId)
+                    setHostProfile(hostData)
                 }
             } catch (err) {
                 setError(err)
@@ -125,6 +131,19 @@ export default function VanDetail() {
                     <p className="van-price"><span>${van.price}</span>/day</p>
                     <p>{van.description}</p>
 
+                    {/* Host Profile Section */}
+                    {hostProfile && (
+                        <div className="host-profile-section">
+                            <h3>About the Host</h3>
+                            <div className="host-info">
+                                <Link to={`/user/${van.hostUsername}`} className="host-link">
+                                    <p className="host-name">{hostProfile.username || "Host"}</p>
+                                </Link>
+                                {hostProfile.bio && <p className="host-bio">{hostProfile.bio}</p>}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Contact Host Section */}
                     <div className="contact-host-section">
                         <h3>Contact the Host</h3>
@@ -191,7 +210,7 @@ export default function VanDetail() {
                                                     <BsStarFill key={i} className="star-icon" />
                                                 ))}
                                             </div>
-                                            <p className="reviewer-email">{review.userEmail}</p>
+                                            <p className="reviewer-name">{review.username || review.userEmail}</p>
                                         </div>
                                         <p className="review-text">{review.text}</p>
                                         <p className="review-date">

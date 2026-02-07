@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore, collection, addDoc, doc, getDocs, getDoc, query, where, updateDoc, setDoc } from "firebase/firestore/lite"
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
+import { getFirestore, collection, addDoc, doc, getDocs, getDoc, query, where, updateDoc, setDoc, serverTimestamp } from "firebase/firestore/lite"
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "firebase/auth"
 
 const firebaseConfig = {
     apiKey: "AIzaSyC_cEplLBMhYRt8iBACkJ1JTErKXKpy_us",
@@ -76,13 +76,45 @@ export async function loginUser(creds) {
 export async function registerUser(creds) {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, creds.email, creds.password)
-        return userCredential.user
+        
+        await setDoc(doc(db, "usernames", creds.username.toLowerCase()), { uid: userCredential.user.uid })
+        
+        await createUserProfile(userCredential.user.uid, {
+            username: creds.username.toLowerCase(),
+            userType: creds.userType,
+            email: creds.email,
+            name: "",
+            phone: "",
+            bio: "",
+            instagram: "",
+            twitter: "",
+            website: "",
+            createdAt: serverTimestamp()
+        })
+        return userCredential.user.uid
     } catch (error) {
         throw {
             message: error.message,
             code: error.code
         }
     }
+}
+
+export async function isUsernameAvailable(username) {
+    const usernameRef = doc(db, "usernames", username.toLowerCase())
+    const snapshot = await getDoc(usernameRef)
+
+    return !snapshot.exists()
+}
+
+export async function getUserId(username) {
+    const usernameRef = doc(db, "usernames", username.toLowerCase())
+    const snapshot = await getDoc(usernameRef)
+
+    if (!snapshot.exists()) {
+        throw { message: "Username not found" }
+    }
+    return snapshot.data().uid
 }
 
 export async function logoutUser() {
@@ -114,13 +146,17 @@ export async function addVan(vanData) {
 
         const newId = (maxId + 1).toString()
 
+        const userProfile = await getUserProfile(user.uid)
+        const userName = userProfile?.username
+
         const docRef = await addDoc(vansCollectionRef, {
             id: newId,
             ...vanData,
             hostId: user.uid,
-            createdAt: new Date().toISOString()
+            hostUsername: userName,
+            createdAt: serverTimestamp()
         })
-        return { id: newId, ...vanData, hostId: user.uid, createdAt: new Date().toISOString() }
+        return { id: newId, ...vanData, hostId: user.uid, hostUsername: userName, createdAt: serverTimestamp() }
     } catch (error) {
         throw { message: error.message, code: error.code }
     }
@@ -133,12 +169,16 @@ export async function addReview(vanId, reviewData) {
     }
 
     try {
+        const userProfile = await getUserProfile(user.uid)
+        const userName = userProfile?.username || user.email
+        
         await addDoc(reviewsCollectionRef, {
             vanId,
             userId: user.uid,
             userEmail: user.email,
+            username: userName,
             ...reviewData,
-            createdAt: new Date().toISOString()
+            createdAt: serverTimestamp()
         })
     } catch (error) {
         if (error.code === "permission-denied") {
@@ -172,7 +212,7 @@ export async function sendContactMessage(hostId, message) {
             fromEmail: user.email,
             message,
             read: false,
-            createdAt: new Date().toISOString()
+            createdAt: serverTimestamp()
         })
     } catch (error) {
         if (error.code === "permission-denied") {
@@ -208,7 +248,7 @@ export async function createUserProfile(userId, profileData) {
 export async function updateUserProfile(userId, updates) {
     try {
         const docRef = doc(db, "userProfiles", userId)
-        await updateDoc(docRef, updates)
+        await updateDoc(docRef, {...updates, updatedAt: serverTimestamp() })
     } catch (error) {
         throw { message: error.message, code: error.code }
     }

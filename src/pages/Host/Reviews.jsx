@@ -19,7 +19,7 @@ export default function Reviews() {
                     const vanReviews = await getReviewsForVan(van.vanId)
                     reviews = [...reviews, ...vanReviews.map(r => ({ ...r, vanName: van.name }))]
                 }
-                reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                reviews.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
                 setAllReviews(reviews)
             } catch (err) {
                 setError(err)
@@ -77,7 +77,7 @@ export default function Reviews() {
                                 <p className="van-name">For: {review.vanName}</p>
                             </div>
                             <div className="info">
-                                <p className="name">{review.userEmail}</p>
+                                <p className="name">{review.username}</p>
                                 <p className="date">{new Date(review.createdAt).toLocaleDateString('en-US', { dateStyle: 'long' })}</p>
                             </div>
                             <p className="review-text">{review.text}</p>

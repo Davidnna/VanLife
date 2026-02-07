@@ -16,7 +16,7 @@ export default function Vans() {
             setLoading(true)
             try {
                 const data = await getVans()
-                data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                data.sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate())
                 setVans(data)
             } catch (err) {
                 setError(err)

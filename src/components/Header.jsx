@@ -32,7 +32,7 @@ export default function Header() {
         <header>
             <Link className="site-logo" to="/">#VanLife</Link>
             <nav>
-                {isHost && (
+                {currentUser && isHost && (
                     <NavLink 
                         to="/host"
                         style={({ isActive }) => isActive ? activeStyles : null}
