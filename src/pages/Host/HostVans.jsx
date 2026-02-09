@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { getHostVans } from "../../api"
+import LoadingSpinner from "../../components/LoadingSpinner"
 
 export default function HostVans() {
     const [vans, setVans] = React.useState([])
@@ -40,7 +41,7 @@ export default function HostVans() {
     ))
 
     if (loading) {
-        return <h1 aria-live="polite">Loading...</h1>
+        return <LoadingSpinner />
     }
     
     if (error) {

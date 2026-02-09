@@ -2,6 +2,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 import { BsStarFill } from "react-icons/bs"
 import { getHostVans } from "../../api"
+import LoadingSpinner from "../../components/LoadingSpinner"
 
 export default function Dashboard() {
     const [vans, setVans] = React.useState([])
@@ -39,7 +40,7 @@ export default function Dashboard() {
     }
 
     if (loading) {
-        return <h1 aria-live="polite">Loading...</h1>
+        return <LoadingSpinner />
     }
     
     if (error) {
@@ -73,7 +74,7 @@ export default function Dashboard() {
                 </div>
                 {
                     loading && !vans
-                    ? <h1>Loading...</h1>
+                    ? <LoadingSpinner />
                     : vans.length > 0 ? (
                         <>
                             {renderVanElements(vans)}
@@ -86,9 +87,6 @@ export default function Dashboard() {
                         </div>
                     )
                 }
-                {/*<React.Suspense fallback={<h3>Loading...</h3>}>
-                    <Await resolve={loaderData.vans}>{renderVanElements}</Await>
-                </React.Suspense>*/}
             </section>
         </>
     )

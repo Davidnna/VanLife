@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "../api"
-import { getUserProfile, createUserProfile } from "../api"
+import { auth, getUserProfile, createUserProfile } from "../api"
 
 const AuthContext = createContext()
 
@@ -25,14 +24,10 @@ export function AuthProvider({ children }) {
             if (user) {
                 try {
                     let profile = await getUserProfile(user.uid)
-                    if (!profile) {
-                        profile = { userId: user.uid, userType: "user", email: user.email }
-                        await createUserProfile(user.uid, profile)
-                    }
                     setUserProfile(profile)
                 } catch (err) {
                     console.error("Error loading user profile:", err)
-                    setUserProfile({ userId: user.uid, userType: "user", email: user.email })
+                    setUserProfile(null)
                 }
             } else {
                 setUserProfile(null)

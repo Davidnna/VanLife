@@ -4,13 +4,18 @@ import { addVan } from "../../api"
 import { useAuth } from "../../context/AuthContext"
 
 export default function AddVan() {
-    const [formData, setFormData] = React.useState({ name: "", price: "", description: "", imageUrl: "", type: "simple" })
+    const [formData, setFormData] = React.useState({ 
+        name: "", 
+        price: "", 
+        description: "", 
+        imageUrl: "", 
+        type: "simple" 
+    })
     const [status, setStatus] = React.useState("idle")
     const [error, setError] = React.useState(null)
     const [validationErrors, setValidationErrors] = React.useState({})
 
     const navigate = useNavigate()
-    const { currentUser } = useAuth()
 
     function handleChange(e) {
         const { name, value } = e.target

@@ -18,6 +18,7 @@ export default function Messages() {
             setLoading(true)
             try {
                 const data = await getHostMessages(currentUser.uid)
+                
                 data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 setMessages(data)
             } catch (err) {
@@ -45,16 +46,16 @@ export default function Messages() {
 
             <div className="messages-list">
                 {messages.length > 0 ? (
-                    messages.map((msg) => (
-                        <div key={msg.id} className={`message-item ${msg.read ? "read" : "unread"}`}>
+                    messages.map((message) => (
+                        <div key={message.id} className={`message-item ${message.read ? "read" : "unread"}`}>
                             <div className="message-header">
-                                <h3>{msg.fromEmail}</h3>
+                                <h3>{message.fromEmail}</h3>
                                 <p className="message-date">
-                                    {new Date(msg.createdAt).toLocaleDateString()} {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                    {new Date(message.createdAt).toLocaleDateString()} {new Date(message.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                                 </p>
                             </div>
                             <div className="message-body">
-                                <p>{msg.message}</p>
+                                <p>{message.message}</p>
                             </div>
                         </div>
                     ))

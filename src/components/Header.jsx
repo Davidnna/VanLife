@@ -18,11 +18,10 @@ export default function Header() {
 
     async function handleLogout() {
         try {
-            if (location.pathname === "/profile" || isHost) {
-                navigate("/")
-            }
             await logoutUser()
-            navigate("/")
+            setTimeout(() => {
+                navigate("/")
+            }, 1)
         } catch (error) {
             console.error("Error logging out:", error)
         }
@@ -66,9 +65,7 @@ export default function Header() {
                 ) : (
                     <NavLink to="/login" 
                         className="login-button" 
-                        state={{
-                            from: location.pathname
-                        }} 
+                        state={{ from: location.pathname }} 
                     >
                         Login
                     </NavLink>

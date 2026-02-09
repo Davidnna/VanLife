@@ -21,27 +21,7 @@ export default function SignUp() {
     const { refreshUserProfile } = useAuth()
 
     React.useEffect(() => {
-        if (!value) {
-            setUsernameError("Username is required")
-            setUsernameStatus(null)
-            return
-        }
-        if (value.includes(" ")) {
-            setUsernameError("Username cannot contain spaces")
-            setUsernameStatus(null)
-            return
-        }
-        if (!/^[a-z0-9_]+$/.test(value)) {
-            setUsernameError("Only lowercase letters, numbers, and underscores are allowed")
-            setUsernameStatus(null)
-            return
-        }
-        if (signUpFormData.username.length < 3) {
-            setUsernameError("Username must be at least 3 characters long")
-            setUsernameStatus(null)
-            return
-        }
-        setUsernameError("")
+        if (signUpFormData.username.length < 3) return
 
         const timeout = setTimeout(async () => {
             setChecking(true)
@@ -51,35 +31,27 @@ export default function SignUp() {
         }, 400)
 
         return () => clearTimeout(timeout)
-    }, [signUpFormData.username, usernameError])
+    }, [signUpFormData.username])
 
     function handleSubmit(e) {
         e.preventDefault()
         setError(null)
 
         if (usernameError) {
-            alert(usernameError)
+            setError({ message: usernameError })
             return
         }
 
         if (usernameStatus !== "available") {
-            alert("Please choose another username")
+            setError({ message: "Username is not available" })
             return
         }
 
-        // Validate username
-        if (!signUpFormData.username.trim()) {
-            setError({ message: "Username is required" })
-            return
-        }
-
-        // Validate passwords match
         if (signUpFormData.password !== signUpFormData.confirmPassword) {
             setError({ message: "Passwords do not match" })
             return
         }
 
-        // Validate password length
         if (signUpFormData.password.length < 6) {
             setError({ message: "Password must be at least 6 characters" })
             return
@@ -92,8 +64,8 @@ export default function SignUp() {
             username: signUpFormData.username,
             userType: signUpFormData.userType
         })
-            .then(async res => {
-                await refreshUserProfile(res)
+            .then(async data => {
+                await refreshUserProfile(data)
                 navigate(signUpFormData.userType === "host" ? "/host" : "/vans", { replace: true })
             })
             .catch(err => {
@@ -112,6 +84,32 @@ export default function SignUp() {
         }))
     }
 
+    function handleUsernameChange(e) {
+        handleChange(e)
+        const { value } = e.target
+        if (!value) {
+            setUsernameError("Username is required")
+            setUsernameStatus(null)
+            return
+        }
+        if (value.includes(" ")) {
+            setUsernameError("Username cannot contain spaces")
+            setUsernameStatus(null)
+            return
+        }
+        if (!/^[a-z0-9_]+$/.test(value)) {
+            setUsernameError("Only lowercase letters, numbers, and underscores are allowed")
+            setUsernameStatus(null)
+            return
+        }
+        if (value.length < 3) {
+            setUsernameError("Username must be at least 3 characters long")
+            setUsernameStatus(null)
+            return
+        }
+        setUsernameError("")
+    }
+
     return (
         <div className="login-container">
             <h1>Create an account</h1>
@@ -123,7 +121,7 @@ export default function SignUp() {
             <form onSubmit={handleSubmit} className="login-form">
                 <input
                     name="username"
-                    onChange={handleChange}
+                    onChange={handleUsernameChange}
                     type="text"
                     placeholder="Username"
                     value={signUpFormData.username}

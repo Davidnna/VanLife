@@ -7,11 +7,11 @@ export default function AuthRequired() {
 
     const isHost = userProfile?.userType === "host"
 
-    if (currentUser && location.pathname === "/profile") {
+    if (currentUser) {
         return <Outlet />
     }
     
-    if (!currentUser || !isHost) {
+    if (!isHost) {
         return (
             <Navigate 
                 to="/login" 
