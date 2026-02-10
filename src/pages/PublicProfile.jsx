@@ -81,12 +81,12 @@ export default function PublicProfile() {
                             </a>
                         )}
                         {userProfile?.instagram && (
-                            <a href={`https://instagram.com/${userProfile.instagram}`} target="_blank" rel="noopener noreferrer">
+                            <a href={userProfile.instagram} target="_blank" rel="noopener noreferrer">
                                 📷 Instagram
                             </a>
                         )}
                         {userProfile?.twitter && (
-                            <a href={`https://twitter.com/${userProfile.twitter}`} target="_blank" rel="noopener noreferrer">
+                            <a href={userProfile.twitter} target="_blank" rel="noopener noreferrer">
                                 𝕏 Twitter
                             </a>
                         )}

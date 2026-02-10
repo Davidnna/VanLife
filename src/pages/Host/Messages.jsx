@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 import { useAuth } from "../../context/AuthContext"
 import { getHostMessages } from "../../api"
 import LoadingSpinner from "../../components/LoadingSpinner"
@@ -19,7 +20,7 @@ export default function Messages() {
             try {
                 const data = await getHostMessages(currentUser.uid)
                 
-                data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                data.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
                 setMessages(data)
             } catch (err) {
                 setError(err)
@@ -47,11 +48,16 @@ export default function Messages() {
             <div className="messages-list">
                 {messages.length > 0 ? (
                     messages.map((message) => (
-                        <div key={message.id} className={`message-item ${message.read ? "read" : "unread"}`}>
+                        <div key={message.id} className="message-item">
                             <div className="message-header">
-                                <h3>{message.fromEmail}</h3>
+                                <div className="message-sender-info">
+                                    <Link to={`/user/${message.userUsername}`}>{message.userName}</Link>
+                                    <Link to={`/vans/${message.vanID}`}>
+                                        <p className="message-name">For: {message.vanName}</p>
+                                    </Link>
+                                </div>
                                 <p className="message-date">
-                                    {new Date(message.createdAt).toLocaleDateString()} {new Date(message.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                    {message.createdAt.toDate().toLocaleDateString([], { hour: "2-digit", minute: "2-digit" })}
                                 </p>
                             </div>
                             <div className="message-body">

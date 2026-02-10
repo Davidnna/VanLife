@@ -162,21 +162,9 @@ export async function addVan(vanData) {
     }
 }
 
-export async function addReview(vanId, reviewData) {
-    const user = auth.currentUser
-    if (!user) {
-        throw { message: "You must be logged in to leave a review" }
-    }
-
+export async function addReview(reviewData) {
     try {
-        const userProfile = await getUserProfile(user.uid)
-        const userName = userProfile?.username || user.email
-        
         await addDoc(reviewsCollectionRef, {
-            vanId,
-            userId: user.uid,
-            userEmail: user.email,
-            username: userName,
             ...reviewData,
             createdAt: serverTimestamp()
         })
@@ -199,7 +187,7 @@ export async function getReviewsForVan(vanId) {
     }
 }
 
-export async function sendContactMessage(hostId, message) {
+export async function sendContactMessage(contactData) {
     const user = auth.currentUser
     if (!user) {
         throw { message: "You must be logged in to contact the host" }
@@ -207,11 +195,9 @@ export async function sendContactMessage(hostId, message) {
 
     try {
         await addDoc(messagesCollectionRef, {
-            hostId,
             fromUserId: user.uid,
             fromEmail: user.email,
-            message,
-            read: false,
+            ...contactData,
             createdAt: serverTimestamp()
         })
     } catch (error) {

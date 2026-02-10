@@ -211,7 +211,7 @@ footer {
 
 .van-list {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     justify-items: center;
     gap: 34px;
     margin-top: 57px;
@@ -728,6 +728,10 @@ img.graph {
     font-weight: 600;
 }
 
+.host-reviews .review a:hover {
+    text-decoration: underline;
+}
+
 .host-reviews .review .date {
     color: #8c8c8c;
 }
@@ -1035,6 +1039,10 @@ img.graph {
     margin-bottom: 12px;
 }
 
+.review-header a:hover p {
+    text-decoration: underline;
+}
+
 .stars {
     display: flex;
     gap: 4px;
@@ -1169,15 +1177,12 @@ img.graph {
     padding: 16px;
     background: white;
     transition: all 0.2s ease;
+    border-color: #ff8c38;
+    background: #fffbf7;
 }
 
 .message-item:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.message-item.unread {
-    border-color: #ff8c38;
-    background: #fffbf7;
 }
 
 .message-header {
@@ -1187,11 +1192,26 @@ img.graph {
     margin-bottom: 12px;
 }
 
+.message-sender-info {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.message-sender-info a:hover {
+    text-decoration: underline;
+}
+
 .message-header h3 {
     margin: 0;
     color: #161616;
     font-size: 16px;
     font-weight: 600;
+}
+
+.message-name {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
 }
 
 .message-date {

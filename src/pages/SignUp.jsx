@@ -21,7 +21,7 @@ export default function SignUp() {
     const { refreshUserProfile } = useAuth()
 
     React.useEffect(() => {
-        if (signUpFormData.username.length < 3) return
+        if (signUpFormData.username.length < 3 || usernameError) return
 
         const timeout = setTimeout(async () => {
             setChecking(true)
@@ -97,8 +97,8 @@ export default function SignUp() {
             setUsernameStatus(null)
             return
         }
-        if (!/^[a-z0-9_]+$/.test(value)) {
-            setUsernameError("Only lowercase letters, numbers, and underscores are allowed")
+        if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+            setUsernameError("Only letters, numbers, and underscores are allowed")
             setUsernameStatus(null)
             return
         }

@@ -61,7 +61,7 @@ export default function Profile() {
                         <p><strong>Username:</strong> {userProfile?.username || "Not set"}</p>
                         <p><strong>Email:</strong> {currentUser.email}</p>
                         <p><strong>Account Type:</strong> {userProfile?.userType === "host" ? "Host" : "Regular User"}</p>
-                        <p><strong>Account Created:</strong> {new Date(currentUser.metadata?.creationTime).toLocaleDateString()}</p>
+                        <p><strong>Account Created:</strong> {userProfile?.createdAt.toDate().toLocaleDateString('en-US', { dateStyle: 'long' })}</p>
                     </div>
                 </div>
 

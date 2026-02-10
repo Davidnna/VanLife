@@ -22,7 +22,7 @@ export default function VanDetail() {
     
     const { id } = useParams()
     const location = useLocation()
-    const { currentUser } = useAuth()
+    const { currentUser, userProfile } = useAuth()
 
     React.useEffect(() => {
         async function loadVan() {
@@ -63,7 +63,17 @@ export default function VanDetail() {
         setReviewSubmitting(true)
         setReviewError(null)
         try {
-            await addReview(van.vanId, { rating: reviewForm.rating, text: reviewForm.text })
+            await addReview({ 
+                vanId: van.vanId, 
+                vanID: van.id, 
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                userName: userProfile.name,
+                userUsername: userProfile.username,
+                vanName: van.name, 
+                rating: reviewForm.rating, 
+                text: reviewForm.text 
+            })
             const updatedReviews = await getReviewsForVan(van.vanId)
             setReviews(updatedReviews)
             setReviewForm({ rating: 5, text: "" })
@@ -87,7 +97,15 @@ export default function VanDetail() {
         setContactSubmitting(true)
         setContactError(null)
         try {
-            await sendContactMessage(van.hostId, contactForm)
+            await sendContactMessage({ 
+                hostId: van.hostId, 
+                userName: userProfile.name, 
+                userUsername: userProfile.username,
+                message: contactForm, 
+                vanName: van.name, 
+                vanID: van.id, 
+                vanId: van.vanId 
+            })
             setContactSuccess(true)
             setContactForm("")
             setTimeout(() => setContactSuccess(false), 3000)
@@ -130,43 +148,42 @@ export default function VanDetail() {
                     <h2>{van.name}</h2>
                     <p className="van-price"><span>${van.price}</span>/day</p>
                     <p>{van.description}</p>
-
-                    {/* Host Profile Section */}
+                    
                     {hostProfile && (
                         <div className="host-profile-section">
                             <h3>About the Host</h3>
                             <div className="host-info">
                                 <Link to={`/user/${van.hostUsername}`} className="host-link">
-                                    <p className="host-name">{hostProfile.username || "Host"}</p>
+                                    <p className="host-name">{hostProfile.name}</p>
                                 </Link>
                                 {hostProfile.bio && <p className="host-bio">{hostProfile.bio}</p>}
                             </div>
                         </div>
                     )}
-
-                    {/* Contact Host Section */}
-                    <div className="contact-host-section">
-                        <h3>Contact the Host</h3>
-                        {contactSuccess && <p className="success-message">Message sent successfully!</p>}
-                        {contactError?.message && <p className="error-message">{contactError.message}</p>}
-                        <form onSubmit={handleContactSubmit} className="contact-form">
-                            <textarea
-                                value={contactForm}
-                                onChange={(e) => setContactForm(e.target.value)}
-                                placeholder="Send a message to the host..."
-                                rows="4"
-                            />
-                            <button type="submit" disabled={contactSubmitting} className="link-button">
-                                {contactSubmitting ? "Sending..." : "Send Message"}
-                            </button>
-                        </form>
-                    </div>
-
-                    {/* Reviews Section */}
+                    
+                    {(userProfile || userProfile?.userType !== "host") && (
+                        <div className="contact-host-section">
+                            <h3>Contact the Host</h3>
+                            {contactSuccess && <p className="success-message">Message sent successfully!</p>}
+                            {contactError?.message && <p className="error-message">{contactError.message}</p>}
+                            <form onSubmit={handleContactSubmit} className="contact-form">
+                                <textarea
+                                    value={contactForm}
+                                    onChange={(e) => setContactForm(e.target.value)}
+                                    placeholder="Send a message to the host..."
+                                    rows="4"
+                                />
+                                <button type="submit" disabled={contactSubmitting} className="link-button">
+                                    {contactSubmitting ? "Sending..." : "Send Message"}
+                                </button>
+                            </form>
+                        </div>
+                    )}
+                    
                     <div className="reviews-section">
                         <h3>Guest Reviews</h3>
                         
-                        {currentUser && (
+                        {currentUser && userProfile?.userType === "user" && (
                             <div className="add-review">
                                 <h4>Leave a Review</h4>
                                 {reviewError?.message && <p className="error-message">{reviewError.message}</p>}
@@ -210,16 +227,18 @@ export default function VanDetail() {
                                                     <BsStarFill key={i} className="star-icon" />
                                                 ))}
                                             </div>
-                                            <p className="reviewer-name">{review.username || review.userEmail}</p>
+                                            <Link to={`/user/${review.userUsername}`} className="host-link">
+                                                <p className="reviewer-name">{review.userName}</p>
+                                            </Link>
                                         </div>
                                         <p className="review-text">{review.text}</p>
                                         <p className="review-date">
-                                            {new Date(review.createdAt).toLocaleDateString()}
+                                            {review.createdAt.toDate().toLocaleDateString('en-US', { dateStyle: 'long' })}
                                         </p>
                                     </div>
                                 ))
                             ) : (
-                                <p className="no-reviews">No reviews yet. Be the first to review!</p>
+                                <p className="no-reviews">No reviews yet.{userProfile && userProfile.userType === "user" ? " Be the first to review!" : ""}</p>
                             )}
                         </div>
                     </div>

@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 import { getHostVans, getReviewsForVan } from "../../api"
 import { BsStarFill } from "react-icons/bs"
 import imageUrl from "../../assets/images/reviews-graph.png"
@@ -17,7 +18,7 @@ export default function Reviews() {
                 let reviews = []
                 for (const van of vans) {
                     const vanReviews = await getReviewsForVan(van.vanId)
-                    reviews = [...reviews, ...vanReviews.map(r => ({ ...r, vanName: van.name }))]
+                    reviews = [...reviews, ...vanReviews]
                 }
                 reviews.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
                 setAllReviews(reviews)
@@ -74,11 +75,15 @@ export default function Reviews() {
                                 {[...Array(review.rating)].map((_, i) => (
                                     <BsStarFill className="review-star" key={i} />
                                 ))}
-                                <p className="van-name">For: {review.vanName}</p>
+                                <Link to={`/vans/${review.vanID}`}>
+                                    <p className="van-name">For: {review.vanName}</p>
+                                </Link>
                             </div>
                             <div className="info">
-                                <p className="name">{review.username}</p>
-                                <p className="date">{new Date(review.createdAt).toLocaleDateString('en-US', { dateStyle: 'long' })}</p>
+                                <Link to={`/user/${review.userUsername}`}>
+                                    <p className="name">{review.userName}</p>
+                                </Link>
+                                <p className="date">{review.createdAt.toDate().toLocaleDateString('en-US', { dateStyle: 'long' })}</p>
                             </div>
                             <p className="review-text">{review.text}</p>
                         </div>
