@@ -16,11 +16,8 @@ const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 export const auth = getAuth(app)
 
-// Collections
 const vansCollectionRef = collection(db, "vans")
 const reviewsCollectionRef = collection(db, "reviews")
-const contactsCollectionRef = collection(db, "contacts")
-const userProfilesCollectionRef = collection(db, "userProfiles")
 const messagesCollectionRef = collection(db, "messages")
 
 export async function getVans() {
@@ -52,10 +49,7 @@ export async function getHostVan(id) {
     if (!user) {
         throw { message: "User not authenticated" }
     }
-    const q = query(
-        vansCollectionRef,
-        where("hostId", "==", user.uid)
-    )
+    const q = query(vansCollectionRef, where("hostId", "==", user.uid))
     const snapshot = await getDocs(q)
     const vans = snapshot.docs.map(doc => doc.data())
     return vans.find(van => van.id === id)
@@ -156,7 +150,7 @@ export async function addVan(vanData) {
             hostUsername: userName,
             createdAt: serverTimestamp()
         })
-        return { id: newId, ...vanData, hostId: user.uid, hostUsername: userName, createdAt: serverTimestamp() }
+        return docRef
     } catch (error) {
         throw { message: error.message, code: error.code }
     }

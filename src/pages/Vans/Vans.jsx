@@ -28,6 +28,19 @@ export default function Vans() {
         loadVans()
     }, [])
 
+    const types = ["simple", "luxury", "rugged"]
+
+    const filterButtons = types.map(type => (
+        <button 
+            type={type}
+            onClick={() => handleFilterChange("type", type)}
+            className={
+                `van-type ${type} 
+                ${typeFilter === type ? "selected" : ""}`
+            }
+        >{type.charAt(0).toUpperCase() + type.slice(1)}</button>
+    ))
+
     const displayedVans = typeFilter
         ? vans.filter(van => van.type === typeFilter)
         : vans
@@ -74,27 +87,7 @@ export default function Vans() {
         <div className="van-list-container">
             <h1>Explore our van options</h1>
             <div className="van-list-filter-buttons">
-                <button
-                    onClick={() => handleFilterChange("type", "simple")}
-                    className={
-                        `van-type simple 
-                        ${typeFilter === "simple" ? "selected" : ""}`
-                    }
-                >Simple</button>
-                <button
-                    onClick={() => handleFilterChange("type", "luxury")}
-                    className={
-                        `van-type luxury 
-                        ${typeFilter === "luxury" ? "selected" : ""}`
-                    }
-                >Luxury</button>
-                <button
-                    onClick={() => handleFilterChange("type", "rugged")}
-                    className={
-                        `van-type rugged 
-                        ${typeFilter === "rugged" ? "selected" : ""}`
-                    }
-                >Rugged</button>
+                {filterButtons}
 
                 {typeFilter ? (
                     <button
@@ -102,7 +95,6 @@ export default function Vans() {
                         className="van-type clear-filters"
                     >Clear filter</button>
                 ) : null}
-
             </div>
             <div className="van-list">
                 {vanElements.length > 0 ? (

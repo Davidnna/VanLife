@@ -1,7 +1,6 @@
 import React from "react"
 import { useNavigate } from "react-router-dom"
 import { addVan } from "../../api"
-import { useAuth } from "../../context/AuthContext"
 
 export default function AddVan() {
     const [formData, setFormData] = React.useState({ 

@@ -2,12 +2,11 @@ import React from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { updateUserProfile } from "../api"
-import LoadingSpinner from "../components/LoadingSpinner"
 
 export default function Profile() {
     const { currentUser, userProfile, refreshUserProfile } = useAuth()
     const navigate = useNavigate()
-    const [isEditing, setIsEditing] = React.useState(false)
+
     const [formData, setFormData] = React.useState({
         name: userProfile?.name || "",
         phone: userProfile?.phone || "",
@@ -16,6 +15,7 @@ export default function Profile() {
         twitter: userProfile?.twitter || "",
         website: userProfile?.website || ""
     })
+    const [isEditing, setIsEditing] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(null)
     const [success, setSuccess] = React.useState(false)
@@ -58,7 +58,7 @@ export default function Profile() {
                 <div className="profile-section">
                     <h2>Account Information</h2>
                     <div className="profile-info">
-                        <p><strong>Username:</strong> {userProfile?.username || "Not set"}</p>
+                        <p><strong>Username:</strong> {userProfile?.username}</p>
                         <p><strong>Email:</strong> {currentUser.email}</p>
                         <p><strong>Account Type:</strong> {userProfile?.userType === "host" ? "Host" : "Regular User"}</p>
                         <p><strong>Account Created:</strong> {userProfile?.createdAt.toDate().toLocaleDateString('en-US', { dateStyle: 'long' })}</p>

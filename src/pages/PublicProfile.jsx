@@ -4,12 +4,13 @@ import { getUserProfile, getVans, getUserId } from "../api"
 import LoadingSpinner from "../components/LoadingSpinner"
 
 export default function PublicProfile() {
-    const { username } = useParams()
-    const navigate = useNavigate()
     const [userProfile, setUserProfile] = React.useState(null)
     const [hostVans, setHostVans] = React.useState([])
     const [loading, setLoading] = React.useState(true)
     const [error, setError] = React.useState(null)
+    
+    const { username } = useParams()
+    const navigate = useNavigate()
 
     React.useEffect(() => {
         async function loadProfile() {

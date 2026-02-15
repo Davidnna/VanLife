@@ -1703,6 +1703,10 @@ img.graph {
     gap: 12px;
 }
 
+.host-info a:hover p {
+    text-decoration: underline;
+}
+
 .host-link {
     text-decoration: none;
     color: inherit;

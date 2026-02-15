@@ -37,7 +37,6 @@ export default function VanDetail() {
                     reviewsData.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
                     setReviews(reviewsData)
                     
-                    // Fetch host profile
                     const hostData = await getUserProfile(data.hostId)
                     setHostProfile(hostData)
                 }
@@ -181,7 +180,7 @@ export default function VanDetail() {
                     )}
                     
                     <div className="reviews-section">
-                        <h3>Guest Reviews</h3>
+                        <h3>Reviews</h3>
                         
                         {currentUser && userProfile?.userType === "user" && (
                             <div className="add-review">
